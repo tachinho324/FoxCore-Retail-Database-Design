@@ -1,0 +1,81 @@
+# INSERT:Insert new data into a table.
+INSERT INTO Venue (VenueID, VenueName, StreetAddress, City, State,
+ PostalCode, Description) VALUES ('V001', 'Convention Center', '123 Main St',
+ Toronto, Ontario, '12345', 'Large venue for conventions and trade shows');
+
+# UPDATE:Modifyexisting data in a table.
+Example: UPDATE Event SET EventName = ‘FoxCore Summer Festival’ WHERE
+ EventID = ‘E002’;
+
+# DELETE:Removedatafrom a table.
+ ○ Example: DELETE FROM Product WHERE ProductID = ‘P001’;
+
+# Findall events at a specific venue
+ SELECT EventName, StartDate, EndDate
+ FROM Event
+ WHERE VenueID = ‘V001’;
+
+# Findtotal sales for a product across all events along with their venues:
+ SELECT v.VenueName, e.EventName, e.StartDate, e.EndDate, SUM(s.QuantitySold *
+ s.SellingPrice) AS TotalSales
+ FROM Event e
+ JOIN Sales s ON e.EventID = s.EventID
+ JOIN Venue v ON e.VenueID = v.VenueID
+ GROUP BY v.VenueName, e.EventName, e.StartDate, e.EndDate
+ ORDER BY v.VenueName, TotalSales DESC;
+
+# Findsalespeople who worked on a particular event, as well as their total sales and
+ commission for that event. Assuming that the commission is 5% of the total sales.
+ SELECT s.FirstName, s.LastName, SUM(sa.QuantitySold * sa.SellingPrice) AS
+ TotalSales, SUM(sa.QuantitySold * sa.SellingPrice) * 0.05 AS Commission
+ FROM Salesperson s
+ INNER JOIN Shift sh ON s.SalespersonID = sh.SalespersonID
+ INNER JOIN Sales sa ON sh.ShiftID = sa.ShiftID
+ INNER JOIN Event e ON sa.EventID = e.EventID
+ WHERE e.EventID = ‘E002’
+ GROUP BY s.FirstName, s.LastName;
+
+# Findwhichproduct is sold by which salesperson at what quantity and price at a
+ particular event and on which event date.
+ SELECT p.productName, s.FirstName, s.LastName, sa.QuantitySold, sa.SellingPrice,
+ e.Eventname, sa.salesdate
+ FROM Salesperson s
+ JOIN Shift sh ON s.SalespersonID = sh.SalespersonID
+ JOIN Sales sa ON sh.ShiftID = sa.ShiftID
+ JOIN Event e ON sa.EventID = e.EventID
+ JOIN product p ON p.productID=sa.productID;
+
+# Findthemonth-on-month total sales.
+ SELECT YEAR(s.SalesDate) AS SaleYear, MONTH(s.SalesDate) AS SaleMonth,
+ SUM(s.QuantitySold * s.SellingPrice) AS TotalSales
+ FROM Sales s
+ GROUP BY YEAR(s.SalesDate), MONTH(s.SalesDate)
+ ORDER BY SaleYear, SaleMonth;
+
+ # Individual sales of different products.
+ SELECT p.productid, p.productname, SUM(sa.QuantitySold * sa.SellingPrice) AS
+ TotalSales
+ FROM Sales sa
+ JOIN product p ON p.productID=sa.productID
+ JOIN event e ON e.eventID=sa.eventID
+ JOIN shift sh ON sh.shiftID= sa.shiftid
+ GROUP BY p.ProductID;
+
+# Thetotal quantity of a product sold by a salesperson at an event
+ SELECT sp.Firstname, sp.Lastname,e.eventname, p.productname,
+ SUM(s.quantitysold) AS Totalquantitysold
+ FROM sales s
+ JOIN Shift sh ON s.Shiftid=sh.shiftid
+ JOIN event e ON e.eventid=s.eventid
+ JOIN product p ON s.productid=p.productid
+ JOIN salesperson sp ON sh.salespersonid=sp.salespersonid
+ GROUP BY sp.salespersonid,e.eventid, p.productid;
+
+# Findthetotal sales of all products in events.
+ SELECT e.EventName, p.ProductName, SUM(s.QuantitySold * s.SellingPrice) AS
+ TotalSales
+ FROM Sales s
+ JOIN Event e ON s.EventID = e.EventID
+ JOIN Product p ON s.ProductID = p.ProductID
+ GROUP BY e.EventName, p.ProductName
+ ORDER BY TotalSales DESC;
