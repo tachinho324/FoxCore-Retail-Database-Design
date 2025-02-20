@@ -1,1 +1,1 @@
-# -FoxCore-Retail-Database-Design
+# FoxCore-Retail-Database-Design
