@@ -1,0 +1,72 @@
+ CREATE TABLE Venue(
+ VenueID VARCHAR(10) NOT NULL,
+7
+ VenueName VARCHAR(50) NOT NULL,
+ StreetAddress VARCHAR(50) NOT NULL,
+ City VARCHAR(50) NOT NULL,
+ State CHAR(50) NOT NULL,
+ PostalCode NUMERIC(5) NOT NULL,
+ Description VARCHAR(255) NOT NULL,
+ PRIMARY KEY (VenueID));
+ CREATE TABLE Event(
+ EventID VARCHAR(10) NOT NULL,
+ VenueID VARCHAR(10) NOT NULL,
+ EventName VARCHAR(50) NOT NULL,
+ StartDate DATE NOT NULL,
+ EndDate DATE NOT NULL,
+ Description VARCHAR(255),
+ EventType VARCHAR(25),
+ CHECK (Eventtype IN ('Trade Show', 'Rib Fest', 'Waterfront festival', 'Music Festival',
+ 'Beer Festival', 'Sporting Event', 'Street Festival')),
+ PRIMARY KEY (EventID),
+ FOREIGN KEY (VenueID) REFERENCES Venue(VenueID)
+ ON UPDATE CASCADE
+ ON DELETE NO ACTION);
+ CREATE TABLE Booth(
+ BoothID VARCHAR(10) NOT NULL,
+ EventID VARCHAR(10) NOT NULL,
+ Location VARCHAR(255) NOT NULL,
+ PRIMARY KEY (BoothID),
+ FOREIGN KEY (EventID) REFERENCES Event(EventID)
+ ON UPDATE CASCADE
+ ON DELETE NO ACTION);
+ CREATE TABLE Product(
+ ProductID VARCHAR(10) NOT NULL,
+ ProductName VARCHAR(50) NOT NULL,
+ WholesaleCode DECIMAL(10, 2) NOT NULL,
+ MinSellPrice DECIMAL(10, 2) NOT NULL,
+ PRIMARY KEY (ProductID));
+ CREATE TABLE Salesperson(
+ SalespersonID VARCHAR(10) NOT NULL,
+ FirstName VARCHAR(20) NOT NULL,
+ LastName VARCHAR(20) NOT NULL,
+ StreetAddress VARCHAR(50) NOT NULL,
+ City VARCHAR(50) NOT NULL,
+ State CHAR(50) NOT NULL,
+ PostalCode NUMERIC(5) NOT NULL,
+ PhoneNumber NUMERIC(10) NOT NULL,
+ PRIMARY KEY (SalespersonID),
+ UNIQUE KEY (PhoneNumber));
+8
+ CREATE TABLE Shift(
+ ShiftID VARCHAR(10) NOT NULL,
+ SalespersonID VARCHAR(10) NOT NULL,
+ BoothID VARCHAR(10) NOT NULL,
+ StartTime TIMESTAMP NOT NULL,
+ EndTime TIMESTAMP NOT NULL,
+ PRIMARY KEY (ShiftID),
+ FOREIGN KEY (SalespersonID) REFERENCES Salesperson(SalespersonID)
+ FOREIGN KEY (BoothID) REFERENCES Booth(BoothID));
+ CREATE TABLE Sales(
+ SalesID VARCHAR(10) NOT NULL,
+ EventID VARCHAR(10) NOT NULL,
+ ShiftID VARCHAR(10) NOT NULL,
+ ProductID VARCHAR(10) NOT NULL,
+ QuantitySold NUMERIC(10) NOT NULL,
+ SellingPrice DECIMAL(10, 2) NOT NULL,
+ StartDate DATE NOT NULL,
+ PRIMARY KEY (SalesID),
+ FOREIGN KEY (EventID) REFERENCES Event(EventID)
+ FOREIGN KEY (ShiftID) REFERENCES Shift(ShiftID)
+ FOREIGN KEY (ProductID) REFERENCES Product(ProductID));
+
